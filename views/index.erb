@@ -9,6 +9,19 @@
   <script src="/main.js"></script>
 </head>
 <body>
-  <p>Hello world</p>
+  <h1>View environment vars and secret files</h1>
+  <p>This little app will show environment variables and files mounted under <code>/secret</code> folder.</p>
+  <h2>Secrets</h2>
+  <pre>
+/secret/database/url - postgres://...
+  </pre>
+  <h2>Environment Variables</h2>
+  <pre>
+<%=
+ENV.keys.sort.map do |key|
+  key + "=" + ENV[key]
+end.join("\n")
+%>
+  </pre>
 </body>
 </html>
