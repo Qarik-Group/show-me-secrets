@@ -1,4 +1,4 @@
-# Spring Music for Kubernetes Service Catalog
+# Ruby app that uses for Kubernetes Service Catalog
 
 ![show-me-secrets](docs/show-me-secrets-demo.png)
 
