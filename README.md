@@ -1,5 +1,7 @@
 # Spring Music for Kubernetes Service Catalog
 
+![show-me-secrets](docs/show-me-secrets-demo.png)
+
 To deploy the sample Ruby/Sinatra application with a service instance/binding from your Service Catalog:
 
 ```shell
@@ -9,12 +11,22 @@ helm upgrade --install show-me-secrets . \
 
 In the example above, it is assumed that your Service Catalog has a service class "cleardb" with a service plan "spark".
 
-To run Spring Music without a database service instnace/binding:
+To run the app without a database service instnace/binding:
 
 ```shell
 helm upgrade --install show-me-secrets . \
     --set "database.service.class=null"
 ```
+
+To view the app via port forwarding:
+
+```shell
+export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=ruby-with-binding,app.kubernetes.io/instance=show-me-secrets" -o jsonpath="{.items[0].metadata.name}")
+echo "Visit http://127.0.0.1:3000 to use your application"
+kubectl port-forward $POD_NAME 3000:8080
+```
+
+As it says, visit http://127.0.0.1:3000 to use your application.
 
 ## Clean up
 
