@@ -16,7 +16,11 @@
   <pre>
 <%=
 Dir["#{secrets_base_dir}/**/*"].map do |path|
-path + "=" + File.read(path)
+  if File.directory?(path)
+    path + "={directory}"
+  else
+    path + "=" + File.read(path)
+  end
 end.join("\n")
 %>
   </pre>
