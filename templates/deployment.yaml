@@ -1,0 +1,66 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ include "ruby-with-binding.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "ruby-with-binding.name" . }}
+    helm.sh/chart: {{ include "ruby-with-binding.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "ruby-with-binding.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "ruby-with-binding.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          {{- if .Values.database.service.class }}
+          env:
+          - name: DATABASE_URL
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "ruby-with-binding.fullname" . }}-db-secret
+                key: uri
+          - name: DATABASE_JDBC_URL
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "ruby-with-binding.fullname" . }}-db-secret
+                key: jdbcUrl
+          - name: DATABASE_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "ruby-with-binding.fullname" . }}-db-secret
+                key: username
+          - name: DATABASE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "ruby-with-binding.fullname" . }}-db-secret
+                key: password
+          {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+      {{- if .Values.database.service.class }}
+      volumes:
+        - name: db-credentials
+          secret:
+            secretName: {{ template "ruby-with-binding.fullname" . }}-db-secret
+      {{- end }}
