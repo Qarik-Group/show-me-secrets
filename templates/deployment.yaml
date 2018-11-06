@@ -27,8 +27,22 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
-          {{- if .Values.database.service.class }}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+      {{- if .Values.database.service.class }}
+          volumeMounts:
+          - name: db-credentials
+            mountPath: "/secrets/db-credentials"
+            readOnly: true
           env:
+          - name: SECRETS_BASE_DIR
+            value: /secrets
           - name: DATABASE_URL
             valueFrom:
               secretKeyRef:
@@ -49,16 +63,6 @@ spec:
               secretKeyRef:
                 name: {{ template "ruby-with-binding.fullname" . }}-db-secret
                 key: password
-          {{- end }}
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
-      {{- if .Values.database.service.class }}
       volumes:
         - name: db-credentials
           secret:

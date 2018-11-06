@@ -12,8 +12,13 @@
   <h1>View environment vars and secret files</h1>
   <p>This little app will show environment variables and files mounted under <code>/secret</code> folder.</p>
   <h2>Secrets</h2>
+  <p>List of files and their contents within secrets directory <code><%= secrets_base_dir %></code>:</p>
   <pre>
-/secret/database/url - postgres://...
+<%=
+Dir["#{secrets_base_dir}/**/*"].map do |path|
+path + "=" + File.read(path)
+end.join("\n")
+%>
   </pre>
   <h2>Environment Variables</h2>
   <pre>
