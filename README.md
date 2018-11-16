@@ -1,11 +1,14 @@
-# Ruby app that uses for Kubernetes Service Catalog
+# Displays environment variables and /secrets folders
 
 ![show-me-secrets](docs/show-me-secrets-demo.png)
 
 To deploy the sample Ruby/Sinatra application with a service instance/binding from your Service Catalog:
 
 ```shell
-helm upgrade --install show-me-secrets . \
+helm plugin install https://github.com/hypnoglow/helm-s3.git
+helm repo add starkandwayne s3://helm.starkandwayne.com/charts
+
+helm upgrade --install show-me-secrets starkandwayne/show-me-secrets \
     --set "database.service.class=cleardb,database.service.plan=spark"
 ```
 
@@ -14,7 +17,7 @@ In the example above, it is assumed that your Service Catalog has a service clas
 To run the app without a database service instnace/binding:
 
 ```shell
-helm upgrade --install show-me-secrets . \
+helm upgrade --install show-me-secrets starkandwayne/show-me-secrets \
     --set "database.service.class=null"
 ```
 
