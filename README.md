@@ -7,6 +7,7 @@ To deploy the sample Ruby/Sinatra application with a service instance/binding fr
 ```shell
 helm plugin install https://github.com/hypnoglow/helm-s3.git
 helm repo add starkandwayne s3://helm.starkandwayne.com/charts
+helm repo update
 
 helm upgrade --install show-me-secrets starkandwayne/show-me-secrets \
     --set "database.service.class=cleardb,database.service.plan=spark"

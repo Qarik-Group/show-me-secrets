@@ -10,9 +10,9 @@ database:
     plan: spark
 
 image:
-  repository: drnic/show-me-secrets-ruby
+  repository: drnic/show-me-secrets
   tag: 0.1.0
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
 
 nameOverride: ""
 fullnameOverride: ""
