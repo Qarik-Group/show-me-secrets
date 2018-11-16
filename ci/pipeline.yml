@@ -21,6 +21,9 @@ meta:
     name: starkandwayne/concourse-kubernetes
     tag: latest
 
+  helm:
+    chart_path: .
+
   git:
     email:  (( param "Please provide the git email for automated commits" ))
     name:   (( param "Please provide the git name for automated commits" ))
@@ -116,20 +119,20 @@ jobs:
               - name: git
             outputs:
               - name: gh
-              - name: pushme
+              - name: (( grab meta.name ))
               - name: notifications
             run:
               path: ./git/ci/scripts/shipit
               args: []
             params:
               CHART_NAME:   (( grab meta.name ))
-              CHART_ROOT:   .
+              CHART_ROOT:   (( grab meta.helm.chart_path ))
               REPO_ROOT:    git
               VERSION_FROM: version/number
               RELEASE_ROOT: gh
-              REPO_OUT:     pushme
-              BRANCH:        (( grab meta.github.branch ))
-              GITHUB_OWNER:  (( grab meta.github.owner ))
+              REPO_OUT:     (( grab meta.name ))
+              BRANCH:       (( grab meta.github.branch ))
+              GITHUB_OWNER: (( grab meta.github.owner ))
               GIT_EMAIL:      (( grab meta.git.email ))
               GIT_NAME:       (( grab meta.git.name ))
               NOTIFICATION_OUT: notifications
@@ -142,7 +145,7 @@ jobs:
         put: git
         params:
           rebase: true
-          repository: pushme
+          repository: (( grab meta.name ))
       - name: github-release
         put: github
         params:
