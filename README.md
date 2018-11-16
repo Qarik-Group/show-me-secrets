@@ -1,5 +1,7 @@
 # Displays environment variables and /secrets folders
 
+The primary purpose of this application was to show how a service instance from Service Catalog could appear as both a set of environment variables or files on the file system.
+
 ![show-me-secrets](docs/show-me-secrets-demo.png)
 
 To deploy the sample Ruby/Sinatra application with a service instance/binding from your Service Catalog:
