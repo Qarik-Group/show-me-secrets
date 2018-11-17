@@ -131,6 +131,7 @@ jobs:
             REPO_ROOT:    git
             K8S_CLUSTER:  kube
             GCP_SERVICEACCOUNT: (( grab meta.google.serviceaccount ))
+            NAMESPACE:    (( concat "test-" meta.name ))
     ensure:
       do:
         - put: kube

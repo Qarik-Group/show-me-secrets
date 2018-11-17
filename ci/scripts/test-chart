@@ -13,6 +13,7 @@ set -eu
 : ${CHART_ROOT:?required}
 : ${REPO_ROOT:?required}
 : ${K8S_CLUSTER:?required}
+: ${NAMESPACE:?required}
 
 header() {
 	echo
@@ -30,3 +31,18 @@ $DIR/lib/kubernetes-target.sh
 
 kubectl get pods --all-namespaces
 
+header "Install chart"
+
+kubectl create ns ${NAMESPACE}
+function finish {
+  header "Cleanup namespace ${NAMESPACE}"
+  kubectl get pods -n ${NAMESPACE}
+  kubectl delete ns ${NAMESPACE}
+}
+trap finish EXIT SIGINT SIGTERM
+
+helm upgrade --install test ${REPO_ROOT}/${CHART_ROOT} \
+    -n ${NAMESPACE} \
+    --set "database.service.class=null"
+
+timeout 5s kubectl get pods -w -n ${NAMESPACE}
