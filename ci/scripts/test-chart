@@ -1,0 +1,32 @@
+#!/bin/bash
+
+#
+# ci/scripts/test-chart
+#
+# Script for installing Helm chart to test it
+#
+# author:  Dr Nic Williams <drnicwilliams@gmail.com>
+# created: 2018-11-17
+
+set -eu
+
+: ${CHART_ROOT:?required}
+: ${REPO_ROOT:?required}
+: ${K8S_CLUSTER:?required}
+
+header() {
+	echo
+	echo "###############################################"
+	echo
+	echo $*
+	echo
+}
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+header "Authenticate to Kubernetes"
+
+$DIR/lib/kubernetes-target.sh
+
+kubectl get pods --all-namespaces
+

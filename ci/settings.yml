@@ -11,6 +11,16 @@ meta:
     email:  ((git-commit-email))
     name:   ((git-commit-name))
 
+  kubernetes:
+    pool:
+      uri: git@github.com:drnic/example-concourse-kubenetes-pool.git
+      branch: master
+      private_key: ((github-private-key))
+      name: gke
+
+  google:
+    serviceaccount: ((gcp-service-account-knative-experiments))
+
   aws:
     bucket:      (( grab meta.pipeline ))
     region_name: us-east-1
