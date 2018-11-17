@@ -31,6 +31,10 @@ $DIR/lib/kubernetes-target.sh
 
 kubectl get pods --all-namespaces
 
+header "Configure Helm"
+
+helm init -c
+
 header "Install chart"
 
 kubectl create ns ${NAMESPACE}
@@ -42,7 +46,7 @@ function finish {
 trap finish EXIT SIGINT SIGTERM
 
 helm upgrade --install test ${REPO_ROOT}/${CHART_ROOT} \
-    -n ${NAMESPACE} \
+    --namespace ${NAMESPACE} \
     --set "database.service.class=null"
 
 timeout 5s kubectl get pods -w -n ${NAMESPACE}
