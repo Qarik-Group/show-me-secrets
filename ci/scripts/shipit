@@ -69,16 +69,6 @@ sed -e "s/^  tag:.*$/  tag: ${VERSION}/g" ${CHART_ROOT}/values.yaml > $tmpfile
 cp $tmpfile ${CHART_ROOT}/values.yaml
 popd
 
-header "Install helm"
-curl -LO https://storage.googleapis.com/kubernetes-helm/helm-v${HELM_VERSION}-linux-amd64.tar.gz
-tar xfz helm-*.tar.gz
-mv linux-amd64/helm  /usr/local/bin
-helm version --client
-helm init --client-only
-
-header "Install helm-s3 plugin"
-helm plugin install https://github.com/hypnoglow/helm-s3.git
-
 header "Build helm chart"
 mkdir -p ${RELEASE_ROOT}/artifacts
 helm package ${REPO_OUT}/${CHART_ROOT} -d ${RELEASE_ROOT}/artifacts
