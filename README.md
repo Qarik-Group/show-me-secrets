@@ -17,11 +17,10 @@ helm upgrade --install show-me-secrets starkandwayne/show-me-secrets \
 
 In the example above, it is assumed that your Service Catalog has a service class "cleardb" with a service plan "spark".
 
-To run the app without a database service instnace/binding:
+To run the app without a database service instance/binding:
 
 ```shell
-helm upgrade --install show-me-secrets starkandwayne/show-me-secrets \
-    --set "database.service.class=null"
+helm upgrade --install show-me-secrets starkandwayne/show-me-secrets
 ```
 
 To view the app via port forwarding:

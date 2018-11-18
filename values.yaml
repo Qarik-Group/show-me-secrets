@@ -6,8 +6,8 @@ replicaCount: 1
 
 database:
   service:
-    class: cleardb
-    plan: spark
+    class: ~
+    plan: ~
 
 image:
   repository: drnic/show-me-secrets
