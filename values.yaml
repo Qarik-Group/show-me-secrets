@@ -11,7 +11,7 @@ database:
 
 image:
   repository: drnic/show-me-secrets
-  tag: 0.1.1
+  tag: 0.1.2
   pullPolicy: IfNotPresent
 
 nameOverride: ""
