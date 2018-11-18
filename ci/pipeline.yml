@@ -149,9 +149,30 @@ jobs:
           - { get: version, passed: [rc], params: {bump: final} }
           - { get: git,     passed: [rc] }
           - { get: image-latest, passed: [latest-image], params: { save: true } }
-      - aggregate:
-        - name: docker-push-tag
-          put: image-latest # as 'vX.Y.Z'
+      - name: docker-push-tag
+        put: image-latest # as 'vX.Y.Z'
+        params:
+          tag:        version/number
+          load:       image-latest
+      - name: package-chart
+        task: package-chart
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: (( grab meta.image.name ))
+              tag:        (( grab meta.image.tag ))
+          inputs:
+            - name: version
+            - name: git
+          outputs:
+            - name: gh
+            - name: (( grab meta.name ))
+            - name: notifications
+          run:
+            path: ./git/ci/scripts/shipit
+            args: []
           params:
             tag:        version/number
             load:       image-latest
@@ -229,7 +250,7 @@ jobs:
     plan:
     - do:
       - aggregate:
-          - { get: git,     trigger: true, passed: [helm-test] }
+          - { get: git,     trigger: true, passed: [latest-image] }
           - { get: version, trigger: true, params: {pre: rc} }
       - task: release-notes
         config:
