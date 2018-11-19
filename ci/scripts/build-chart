@@ -24,11 +24,17 @@ header() {
 
 CHART_NAME=$(bosh int ${REPO_ROOT}/${CHART_ROOT}/Chart.yaml --path /name)
 header "Copy chart into folder with chart name ${CHART_NAME}..."
-mkdir -p chart/${CHART_NAME}
-cp -r ${REPO_ROOT}/${CHART_ROOT}/* chart/${CHART_NAME}
 
-header "Set values.yaml for docker + version"
-echo "TODO ****"
+mkdir -p build-chart/${CHART_NAME}
+cp -r ${REPO_ROOT}/${CHART_ROOT}/* build-chart/${CHART_NAME}
+
+header "Use latest docker image"
+tmpfile=$(mktemp /tmp/chart-yaml.XXXX)
+sed -e "s/^  tag:.*$/  tag: latest/g" build-chart/${CHART_NAME}/values.yaml > $tmpfile
+cp $tmpfile build-chart/${CHART_NAME}/values.yaml
+
+header "Updated values.yaml"
+cat build-chart/${CHART_NAME}/values.yaml
 
 header "Build helm chart"
-helm package chart/${CHART_NAME} -d ${CHART_OUT}
+helm package build-chart/${CHART_NAME} -d ${CHART_OUT}

@@ -84,6 +84,7 @@ groups:
 jobs:
   - name: latest-image
     public: true
+    serial_groups: [test-image]
     plan:
       - get: git
         trigger: true
@@ -100,12 +101,13 @@ jobs:
 
   - name: helm-test
     public: true
+    serial_groups: [test-image] # to ensure :latest is what comes from image-latest above
     plan:
       - aggregate:
-        - { get: git,          trigger: true }
+        - { get: git }
         - { get: image-latest, params: {skip_download: true} }
       # - { get: git,          passed: [latest-image], trigger: true }
-      # - { get: image-latest, passed: [latest-image] }
+      # - { get: image-latest, passed: [latest-image], params: {skip_download: true} }
       - name: build-chart
         task: build-chart
         config:
@@ -131,7 +133,7 @@ jobs:
         params:
           chart: chart/*.tgz
           devel: true
-          wait_until_ready: 10
+          wait_until_ready: 60
 
   - name: shipit
     public: true
@@ -223,7 +225,7 @@ jobs:
       - put: helm-install-latest
         params:
           chart: github/*.tgz
-          wait_until_ready: 10
+          wait_until_ready: 60
 
   - name: rc
     public: true
