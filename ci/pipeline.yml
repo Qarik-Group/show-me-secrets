@@ -70,7 +70,7 @@ meta:
 groups:
   - name: (( grab meta.name ))
     jobs:
-      - latest-image
+      - testflight
       - rc
       - shipit
       - install-published
@@ -80,7 +80,7 @@ groups:
       - minor
       - patch
 jobs:
-  - name: latest-image
+  - name: testflight
     public: true
     plan:
       - get: git
@@ -131,7 +131,7 @@ jobs:
         aggregate:
           - { get: version, passed: [rc], params: {bump: final} }
           - { get: git,     passed: [rc] }
-          - { get: image-latest, passed: [latest-image], params: { save: true } }
+          - { get: image-latest, passed: [testflight], params: { save: true } }
       - name: docker-push-tag
         put: image-latest # as 'vX.Y.Z'
         params:
@@ -220,7 +220,7 @@ jobs:
     plan:
     - do:
       - aggregate:
-          - { get: git,     trigger: true, passed: [latest-image] }
+          - { get: git,     trigger: true, passed: [testflight] }
           - { get: version, trigger: true, params: {pre: rc} }
       - task: release-notes
         config:
