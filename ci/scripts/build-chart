@@ -1,0 +1,34 @@
+#!/bin/bash
+
+#
+# ci/scripts/build-chart
+#
+# Script for build Helm chart package
+#
+# author:  Dr Nic Williams <drnicwilliams@gmail.com>
+# created: 2018-11-17
+
+set -eu
+
+: ${CHART_ROOT:?required}
+: ${REPO_ROOT:?required}
+: ${CHART_OUT:?required}
+
+header() {
+	echo
+	echo "###############################################"
+	echo
+	echo $*
+	echo
+}
+
+CHART_NAME=$(bosh int ${REPO_ROOT}/${CHART_ROOT}/Chart.yaml --path /name)
+header "Copy chart into folder with chart name ${CHART_NAME}..."
+mkdir -p chart/${CHART_NAME}
+cp -r ${REPO_ROOT}/${CHART_ROOT}/* chart/${CHART_NAME}
+
+header "Set values.yaml for docker + version"
+echo "TODO ****"
+
+header "Build helm chart"
+helm package chart/${CHART_NAME} -d ${CHART_OUT}

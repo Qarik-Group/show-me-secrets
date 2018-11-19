@@ -84,7 +84,6 @@ groups:
 jobs:
   - name: latest-image
     public: true
-    serial: true
     plan:
       - get: git
         trigger: true
@@ -107,12 +106,8 @@ jobs:
         - { get: image-latest, params: {skip_download: true} }
       # - { get: git,          passed: [latest-image], trigger: true }
       # - { get: image-latest, passed: [latest-image] }
-        - put: kube
-          resource: kubernetes-pool
-          params:
-            acquire: true
-      - name: test-chart
-        task: test-chart
+      - name: build-chart
+        task: build-chart
         config:
           platform: linux
           image_resource:
@@ -122,23 +117,21 @@ jobs:
               tag:        (( grab meta.image.tag ))
           inputs:
             - name: git
-            - name: kube
             - name: image-latest
+          outputs:
+            - name: chart
           run:
-            path: ./git/ci/scripts/test-chart
+            path: ./git/ci/scripts/build-chart
             args: []
           params:
-            CHART_ROOT:   (( grab meta.helm.chart_path ))
-            REPO_ROOT:    git
-            K8S_CLUSTER:  kube
-            GCP_SERVICEACCOUNT: (( grab meta.google.serviceaccount ))
-            NAMESPACE:    (( concat "test-" meta.name ))
-    ensure:
-      do:
-        - put: kube
-          resource: kubernetes-pool
-          params:
-            release: kube
+            CHART_ROOT: (( grab meta.helm.chart_path ))
+            REPO_ROOT:  git
+            CHART_OUT:  chart
+      - put: helm-install-test
+        params:
+          chart: chart/*.tgz
+          devel: true
+          wait_until_ready: 10
 
   - name: shipit
     public: true
@@ -230,6 +223,7 @@ jobs:
       - put: helm-install-latest
         params:
           chart: github/*.tgz
+          wait_until_ready: 10
 
   - name: rc
     public: true
@@ -353,13 +347,17 @@ resources:
       repository:   (( grab meta.github.repo ))
       access_token: (( grab meta.github.access_token ))
 
-  - name: kubernetes-pool
-    type: pool
+  - name: helm-install-test
+    type: helm
     source:
-      uri: (( grab meta.kubernetes.pool.uri ))
-      branch: (( grab meta.kubernetes.pool.branch ))
-      private_key: (( grab meta.kubernetes.pool.private_key ))
-      pool: (( grab meta.kubernetes.pool.name ))
+      release: (( concat "ci-test-" meta.name ))
+      gcloud_auth: ((gcp-service-account-knative-experiments))
+      gcloud_project: ((gke-project-name))
+      gcloud_cluster: ((gke-cluster-name))
+      gcloud_zone:    ((gke-cluster-zone))
+      ca_cert:        ((helm-ca))
+      client_cert:    ((helm-tiller-cert))
+      client_key:     ((helm-tiller-key))
 
   - name: helm-install-latest
     type: helm
